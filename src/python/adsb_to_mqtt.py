@@ -55,12 +55,16 @@ async def handle_adsb_packet(json_packet):
 async def read_adsb_data():
     global READ_ADSB_SERVICE_ADDR, READ_ADSB_SERVICE_PORT
     reader, writer = await asyncio.open_connection(READ_ADSB_SERVICE_ADDR, READ_ADSB_SERVICE_PORT)
+    complete_packet = ""
     async for packet in reader:
         try:
-            json_packet = json.loads(packet)
-            if json_packet.get("r_dst", 100) < MAX_DISTANCE:
-                logger.info("Aircraft nearby!!!!")
-                asyncio.create_task(handle_adsb_packet(json_packet))
+            complete_packet += packet.decode('ascii')
+            if complete_packet.endswith("}\n"):
+                json_packet = json.loads(complete_packet)
+                complete_packet = ""
+                if json_packet.get("r_dst", 100) < MAX_DISTANCE:
+                    logger.info("Aircraft nearby!!!!")
+                    asyncio.create_task(handle_adsb_packet(json_packet))
         except Exception as e:
             logger.error(f"Failed to process packet: {e}")
 
