@@ -10,7 +10,7 @@ import paho.mqtt.client as mqtt
 logger = logging.getLogger('adsb_to_mqtt')
 
 # Distance in nautical miles in which a plane must pass to be published
-MAX_DISTANCE = 3
+MAX_DISTANCE = 2
 # readsb.service connection address and port
 READ_ADSB_SERVICE_ADDR = "10.0.10.34"
 READ_ADSB_SERVICE_PORT = 30154
