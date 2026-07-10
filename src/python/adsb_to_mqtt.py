@@ -33,8 +33,9 @@ async def handle_adsb_packet(json_packet):
     global MQTT_CLIENT
 
     try:
-        async with aiohttp.ClientSession() as http_session:
+        async with aiohttp.ClientSession(headers={"User-Agent": "adsb_to_mqtt (contact: lists@tomichicreek.com)"}) as http_session:
             async with http_session.get("https://api.planespotters.net/pub/photos/hex/" + json_packet.get("hex", "")) as http_response:
+                http_response.raise_for_status()
                 photo_response = await http_response.json()
                 if len(photo_response.get("photos", [])) > 0:
                     async with http_session.get(photo_response.get("photos", [{}])[0].get("thumbnail_large", {}).get("src", "")) as photo_response:
