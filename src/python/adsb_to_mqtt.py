@@ -102,7 +102,7 @@ def start_mqtt_client():
 # the connection to the server and connect and process packets from the readsb service
 #
 def main():
-    logging.basicConfig(level=logging.INFO, format='%(message)s')
+    logging.basicConfig(level=logging.WARNING, format='%(message)s')
     logger.info("Starting MQTT Thread")
     mqtt_thread = threading.Thread(target=start_mqtt_client, args=())
     mqtt_thread.daemon = True
