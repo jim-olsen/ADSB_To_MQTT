@@ -42,7 +42,7 @@ async def handle_adsb_packet(json_packet):
                         photo = await photo_response.read()
                         uuencoded_photo = base64.b64encode(photo)
                         json_packet["picture"] = uuencoded_photo.decode('ascii')
-                        logger.info(json.dumps(json_packet, indent=2))
+                        logger.debug(json.dumps(json_packet, indent=2))
     except Exception as e:
         logger.error(f"Failed to fetch picture of aircraft: {e}")
 
@@ -64,7 +64,7 @@ async def read_adsb_data():
                 json_packet = json.loads(complete_packet)
                 complete_packet = ""
                 if json_packet.get("r_dst", 100) < MAX_DISTANCE:
-                    logger.info("Aircraft nearby!!!!")
+                    logger.warning("Aircraft nearby!!!!")
                     asyncio.create_task(handle_adsb_packet(json_packet))
         except Exception as e:
             logger.error(f"Failed to process packet: {e}")
@@ -78,11 +78,11 @@ def start_mqtt_client():
     def on_connect(c, userdata, flags, rc):
         global MQTT_CLIENT
 
-        logger.info("MQTT Client Connected")
+        logger.warning("MQTT Client Connected")
         MQTT_CLIENT = c
 
     def on_disconnect(c, userdata, rc):
-        logger.info(f"MQTT Client Disconnected due to {rc}, retrying....")
+        logger.warning(f"MQTT Client Disconnected due to {rc}, retrying....")
         while True:
             try:
                 c.reconnect()
@@ -103,12 +103,12 @@ def start_mqtt_client():
 #
 def main():
     logging.basicConfig(level=logging.WARNING, format='%(message)s')
-    logger.info("Starting MQTT Thread")
+    logger.warning("Starting MQTT Thread")
     mqtt_thread = threading.Thread(target=start_mqtt_client, args=())
     mqtt_thread.daemon = True
     mqtt_thread.start()
 
-    logger.info("Starting Communications Event Loop")
+    logger.warning("Starting Communications Event Loop")
     asyncio.run(read_adsb_data())
 
 if __name__ == "__main__":
